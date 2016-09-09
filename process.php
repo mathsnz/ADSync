@@ -130,7 +130,7 @@ Started: ".date('Y-m-d H:i:s')."
           	$info["userprincipalname"] = $username.$suffix;
             if(
               strtolower($d[0]['sn'][0])!=strtolower($info["sn"]) ||
-              strtolower($d[0]['givenname'])[0]!=strtolower($info["givenname"]) ||
+              strtolower($d[0]['givenname'][0])!=strtolower($info["givenname"]) ||
               strtolower($d[0]['mail'][0])!=strtolower($info["mail"]) ||
               strtolower($d[0]['samaccountname'][0])!=strtolower($info["samaccountname"]) ||
               strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
