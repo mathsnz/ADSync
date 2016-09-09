@@ -89,7 +89,10 @@ Started: ".date('Y-m-d H:i:s')."
             if($createnewstaff!='yes'){continue;}
             // create them if they don't
             $info=array();
-          	$info["cn"] = $firstname." ".$lastname;
+            $cn = $firstname." ".$lastname;
+          	$cn = str_replace("'", '', $cn);
+          	$cn = str_replace("-", '', $cn);
+          	$info["cn"] = $cn;
           	$info["sn"] = $lastname;
           	$info["givenname"] = $firstname;
             $info['objectclass'][0] = "top";
@@ -121,7 +124,9 @@ Started: ".date('Y-m-d H:i:s')."
           } else {
             $dn = $d[0]['dn'];
             // corfirm attributes are correct
-          	$cn = $firstname." ".$lastname;
+            $cn = $firstname." ".$lastname;
+          	$cn = str_replace("'", '', $cn);
+          	$cn = str_replace("-", '', $cn);
             $info=array();
           	$info["sn"] = $lastname;
           	$info["givenname"] = $firstname;
@@ -227,7 +232,10 @@ Started: ".date('Y-m-d H:i:s')."
         if($d['count']<1){
           // create them if they don't
           $info=array();
-          $info["cn"] = $firstname." ".$lastname;
+          $cn = $firstname." ".$lastname;
+          $cn = str_replace("'", '', $cn);
+          $cn = str_replace("-", '', $cn);
+          $info["cn"] = $cn;
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
           $info['objectclass'][0] = "top";
@@ -261,6 +269,8 @@ Started: ".date('Y-m-d H:i:s')."
           // corfirm attributes are correct
           $info=array();
           $cn = $firstname." ".$lastname;
+          $cn = str_replace("'", '', $cn);
+          $cn = str_replace("-", '', $cn);
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
           $info["mail"] = $email;
@@ -280,7 +290,7 @@ Started: ".date('Y-m-d H:i:s')."
           $calcdn = "CN=".$cn.",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
           if($dn!=$calcdn){
             $oldDn = $dn;
-            $newParent = "OU=Staff,".$ldaptree;
+            $newParent = "OU=Year ".$yearlevel",".$ldaptree;
             $newRdn = "CN=".$cn;
             echo "Moving user ".$cn." ($dn to $calcdn)
 ";          if($live=='yes') {ldap_rename($ldapconn, $oldDn, $newRdn, $newParent, true);}
