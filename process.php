@@ -290,7 +290,7 @@ Started: ".date('Y-m-d H:i:s')."
           $calcdn = "CN=".$cn.",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
           if($dn!=$calcdn){
             $oldDn = $dn;
-            $newParent = "OU=Year ".$yearlevel",".$ldaptree;
+            $newParent = "OU=Year ".$yearlevel.",".$ldaptree;
             $newRdn = "CN=".$cn;
             echo "Moving user ".$cn." ($dn to $calcdn)
 ";          if($live=='yes') {ldap_rename($ldapconn, $oldDn, $newRdn, $newParent, true);}
