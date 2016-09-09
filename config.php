@@ -53,9 +53,6 @@ $syncstaff='yes';
 $syncstudents='yes';
 $createnewstaff='no';
 
-// Default Password for New users
-$defaultpassword = '123456';
-
 // Default Staff Groups
 // Put each group on a new line in quotes, with a comma at the end.
 // These groups are added to any new staff that are created.

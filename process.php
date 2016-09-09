@@ -8,6 +8,7 @@ what is going on before doing a live sync... as I say...
 I will not be held responsible if you break your AD.
 */
 
+
 echo "<pre>";
 define(LDAP_OPT_DIAGNOSTIC_MESSAGE, 0x0032);
 
@@ -37,6 +38,7 @@ if($ldapconn) {
         echo "LDAP bind successful...
 Started: ".date('Y-m-d H:i:s')."
 ";
+
     // get list of files from the storage folder
     $files = scandir($storage);
     sort($files);
@@ -102,14 +104,6 @@ Started: ".date('Y-m-d H:i:s')."
           	$info["mail"] = $email;
           	$info["samaccountname"] = $username;
           	$info["userprincipalname"] = $username.$suffix;
-            $newPassword = "\"" . $defaultpassword . "\"";
-            $len = strlen($newPassword);
-            $newPassw = "";
-
-            for($i=0;$i<$len;$i++) {
-                $newPassw .= "{$newPassword{$i}}\000";
-            }
-            $info['userPassword'] = $newPassw;
 
           	// add data to directory
             $dn = "CN=".$info["cn"].",OU=Staff,".$ldaptree;
@@ -135,11 +129,11 @@ Started: ".date('Y-m-d H:i:s')."
           	$info["samaccountname"] = $username;
           	$info["userprincipalname"] = $username.$suffix;
             if(
-              $d[0]['sn'][0]!=$info["sn"] ||
-              $d[0]['givenname'][0]!=$info["givenname"] ||
-              $d[0]['mail'][0]!=$info["mail"] ||
-              $d[0]['samaccountname'][0]!=$info["samaccountname"] ||
-              $d[0]['userprincipalname'][0]!=$info["userprincipalname"]
+              strtolower($d[0]['sn'][0])!=strtolower($info["sn"]) ||
+              strtolower($d[0]['givenname'])[0]!=strtolower($info["givenname"]) ||
+              strtolower($d[0]['mail'][0])!=strtolower($info["mail"]) ||
+              strtolower($d[0]['samaccountname'][0])!=strtolower($info["samaccountname"]) ||
+              strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
             ) {
           	   // update user if they aren't
               echo "Updating user ".$cn." ($dn)
@@ -185,7 +179,6 @@ Started: ".date('Y-m-d H:i:s')."
               $info["cn"] = $groupcn;
               $info['objectclass'][0] = "top";
               $info['objectclass'][1] = "group";
-              $info["sAMAccountName"] = $groupcn;
               $info["description"] = "Timetable Group, Managed by KAMAR.";
               // add data to directory
               echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
@@ -203,11 +196,8 @@ Started: ".date('Y-m-d H:i:s')."
 ";          $group_info['member']=$dn;
             if($live=='yes') {ldap_mod_del($ldapconn,$group,$group_info);}
           }
-          die();
     		}
-        die();
     	}
-      die();
 	if(array_key_exists('students', $data['SMSDirectoryData']) && $syncstudents=='yes') {
       // for each student
       foreach ($data['SMSDirectoryData']['students']['data'] as $i => $student) {
@@ -246,23 +236,15 @@ Started: ".date('Y-m-d H:i:s')."
           $info['objectclass'][2] = "user";
           $info["homeDrive"] = "H:";
           $info["homeDirectory"] = $studenthomes.$username;
-          $info["scriptpath"] = "";
+          //$info["scriptpath"] = "";
           $info["employeeid"] = $id;
           $info["useraccountcontrol"] = 544;
           $info["mail"] = $email;
           $info["samaccountname"] = $username;
           $info["userprincipalname"] = $username.$suffix;
-          $newPassword = "\"" . $defaultpassword . "\"";
-          $len = strlen($newPassword);
-          $newPassw = "";
-
-          for($i=0;$i<$len;$i++) {
-              $newPassw .= "{$newPassword{$i}}\000";
-          }
-          $info['userPassword'] = $newPassw;
 
           // add data to directory
-          $dn = "CN=".$info["cn"].",OU=Students,OU=Year ".$yearlevel.",".$ldaptree;
+          $dn = "CN=".$info["cn"].",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
           echo "Adding user ".$info["cn"]." ($dn)
 ";          $newuser="yes";
           if($live=='yes') {ldap_add($ldapconn, $dn, $info);}
@@ -285,17 +267,17 @@ Started: ".date('Y-m-d H:i:s')."
           $info["samaccountname"] = $username;
           $info["userprincipalname"] = $username.$suffix;
           if(
-            $d[0]['sn'][0]!=$info["sn"] ||
-            $d[0]['givenname'][0]!=$info["givenname"] ||
-            $d[0]['mail'][0]!=$info["mail"] ||
-            $d[0]['samaccountname'][0]!=$info["samaccountname"] ||
-            $d[0]['userprincipalname'][0]!=$info["userprincipalname"]
+            strtolower($d[0]['sn'][0])!=strtolower($info["sn"]) ||
+            strtolower($d[0]['givenname'][0])!=strtolower($info["givenname"]) ||
+            strtolower($d[0]['mail'][0])!=strtolower($info["mail"]) ||
+            strtolower($d[0]['samaccountname'][0])!=strtolower($info["samaccountname"]) ||
+            strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
           ) {
              // update user if they aren't
             echo "Updating user ".$cn." ($dn)
 ";            if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
           }
-          $calcdn = "CN=".$cn.",OU=Students,OU=Year ".$yearlevel.",".$ldaptree;
+          $calcdn = "CN=".$cn.",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
           if($dn!=$calcdn){
             $oldDn = $dn;
             $newParent = "OU=Staff,".$ldaptree;
@@ -327,7 +309,7 @@ Started: ".date('Y-m-d H:i:s')."
           $groupcn=strpos($group,',OU=Groups');
           $groupcn=substr($group,0,$groupcn);
           $groupcn=substr($groupcn,3);
-          $result = ldap_search($ldapconn,"OU=Groups,".$ldaptree, $groupcn) or die ("Error in search query: ".ldap_error($ldapconn));
+          $result = ldap_search($ldapconn,"OU=Groups,".$ldaptree, "CN=".$groupcn) or die ("Error in search query: ".ldap_error($ldapconn));
           $g = ldap_get_entries($ldapconn, $result);
           if($g['count']<1){
             //details
@@ -335,7 +317,6 @@ Started: ".date('Y-m-d H:i:s')."
             $info["cn"] = $groupcn;
             $info['objectclass'][0] = "top";
             $info['objectclass'][1] = "group";
-            $info["sAMAccountName"] = $groupcn;
             $info["description"] = "Timetable Group, Managed by KAMAR.";
             // add data to directory
             echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
