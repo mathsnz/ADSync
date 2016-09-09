@@ -52,7 +52,7 @@ Started: ".date('Y-m-d H:i:s')."
       //if it isn't an array then skip it.
 	    if(!is_array($data)) {continue;}
       //if live then delete the file
-      if($live=='yes'){unlink($storage.$file);}
+      //if($live=='yes'){unlink($storage.$file);}
       // if we don't have data then skip this file
       if(!array_key_exists('SMSDirectoryData', $data)) {continue;}
 	    if(!array_key_exists('instanceID', $data['SMSDirectoryData'])) {continue;}
@@ -86,6 +86,7 @@ Started: ".date('Y-m-d H:i:s')."
           if($d['count']<1){
             if($createnewstaff!='yes'){continue;}
             // create them if they don't
+            $info=array();
           	$info["cn"] = $firstname." ".$lastname;
           	$info["sn"] = $lastname;
           	$info["givenname"] = $firstname;
@@ -127,20 +128,21 @@ Started: ".date('Y-m-d H:i:s')."
             $dn = $d[0]['dn'];
             // corfirm attributes are correct
           	$cn = $firstname." ".$lastname;
+            $info=array();
           	$info["sn"] = $lastname;
           	$info["givenname"] = $firstname;
           	$info["mail"] = $email;
           	$info["samaccountname"] = $username;
           	$info["userprincipalname"] = $username.$suffix;
             if(
-              $d[0]['sn']!=$info["sn"] ||
-              $d[0]['givenname']!=$info["givenname"] ||
-              $d[0]['mail']!=$info["mail"] ||
-              $d[0]['samaccountname']!=$info["samaccountname"] ||
-              $d[0]['userprincipalname']!=$info["userprincipalname"]
+              $d[0]['sn'][0]!=$info["sn"] ||
+              $d[0]['givenname'][0]!=$info["givenname"] ||
+              $d[0]['mail'][0]!=$info["mail"] ||
+              $d[0]['samaccountname'][0]!=$info["samaccountname"] ||
+              $d[0]['userprincipalname'][0]!=$info["userprincipalname"]
             ) {
           	   // update user if they aren't
-              echo "Updating user ".$info["cn"]." ($dn)
+              echo "Updating user ".$cn." ($dn)
 ";            if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
             }
             $calcdn = "CN=".$cn.",OU=Staff,".$ldaptree;
@@ -174,17 +176,21 @@ Started: ".date('Y-m-d H:i:s')."
             //check if group exists
             $groupcn=strpos($group,',OU=Groups');
             $groupcn=substr($group,0,$groupcn);
-            $result = ldap_search($ldapconn,"OU=Groups,".$ldaptree, $groupcn) or die ("Error in search query: ".ldap_error($ldapconn));
+            $groupcn=substr($groupcn,3);
+            $result = ldap_search($ldapconn,"OU=Groups,".$ldaptree, 'CN='.$groupcn) or die ("Error in search query: ".ldap_error($ldapconn));
             $g = ldap_get_entries($ldapconn, $result);
             if($g['count']<1){
               //details
+              $info=array();
               $info["cn"] = $groupcn;
-              $info["objectclass"] = "group";
+              $info['objectclass'][0] = "top";
+              $info['objectclass'][1] = "group";
+              $info["sAMAccountName"] = $groupcn;
               $info["description"] = "Timetable Group, Managed by KAMAR.";
               // add data to directory
-              echo "Creating Group ".$groupcn.",OU=Groups,".$ldaptree."
+              echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
 ";
-              if($live=='yes') {ldap_add($ldapconn, $groupcn.",OU=Groups,".$ldaptree, $info);}
+              if($live=='yes') {ldap_add($ldapconn, 'CN='.$groupcn.",OU=Groups,".$ldaptree, $info);}
             }
             echo "Adding $dn to $group
 ";          $group_info['member']=$dn;
@@ -197,8 +203,11 @@ Started: ".date('Y-m-d H:i:s')."
 ";          $group_info['member']=$dn;
             if($live=='yes') {ldap_mod_del($ldapconn,$group,$group_info);}
           }
+          die();
     		}
+        die();
     	}
+      die();
 	if(array_key_exists('students', $data['SMSDirectoryData']) && $syncstudents=='yes') {
       // for each student
       foreach ($data['SMSDirectoryData']['students']['data'] as $i => $student) {
@@ -227,6 +236,7 @@ Started: ".date('Y-m-d H:i:s')."
 
         if($d['count']<1){
           // create them if they don't
+          $info=array();
           $info["cn"] = $firstname." ".$lastname;
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
@@ -267,6 +277,7 @@ Started: ".date('Y-m-d H:i:s')."
         } else {
           $dn = $d[0]['dn'];
           // corfirm attributes are correct
+          $info=array();
           $cn = $firstname." ".$lastname;
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
@@ -274,11 +285,11 @@ Started: ".date('Y-m-d H:i:s')."
           $info["samaccountname"] = $username;
           $info["userprincipalname"] = $username.$suffix;
           if(
-            $d[0]['sn']!=$info["sn"] ||
-            $d[0]['givenname']!=$info["givenname"] ||
-            $d[0]['mail']!=$info["mail"] ||
-            $d[0]['samaccountname']!=$info["samaccountname"] ||
-            $d[0]['userprincipalname']!=$info["userprincipalname"]
+            $d[0]['sn'][0]!=$info["sn"] ||
+            $d[0]['givenname'][0]!=$info["givenname"] ||
+            $d[0]['mail'][0]!=$info["mail"] ||
+            $d[0]['samaccountname'][0]!=$info["samaccountname"] ||
+            $d[0]['userprincipalname'][0]!=$info["userprincipalname"]
           ) {
              // update user if they aren't
             echo "Updating user ".$cn." ($dn)
@@ -315,17 +326,21 @@ Started: ".date('Y-m-d H:i:s')."
           //check if group exists
           $groupcn=strpos($group,',OU=Groups');
           $groupcn=substr($group,0,$groupcn);
+          $groupcn=substr($groupcn,3);
           $result = ldap_search($ldapconn,"OU=Groups,".$ldaptree, $groupcn) or die ("Error in search query: ".ldap_error($ldapconn));
           $g = ldap_get_entries($ldapconn, $result);
           if($g['count']<1){
             //details
+            $info=array();
             $info["cn"] = $groupcn;
-            $info["objectclass"] = "group";
+            $info['objectclass'][0] = "top";
+            $info['objectclass'][1] = "group";
+            $info["sAMAccountName"] = $groupcn;
             $info["description"] = "Timetable Group, Managed by KAMAR.";
             // add data to directory
-            echo "Creating Group ".$groupcn.",OU=Groups,".$ldaptree."
+            echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
 ";
-            if($live=='yes') {ldap_add($ldapconn, $groupcn.",OU=Groups,".$ldaptree, $info);}
+            if($live=='yes') {ldap_add($ldapconn, 'CN='.$groupcn.",OU=Groups,".$ldaptree, $info);}
           }
           echo "Adding $dn to $group
 ";          $group_info['member']=$dn;
