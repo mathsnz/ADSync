@@ -23,7 +23,7 @@ if(isset($data)) {
 {"SMSDirectoryData": {
 	"error": 0,
 	"result": "OK",
-	"service": "LDAP",
+	"service": "ADSync",
 	"version": 1.0,
 	"status": "Ready"
 }}
@@ -40,7 +40,7 @@ else {
 <SMSDirectoryData>
 	<error>401</error>
 	<result>No Data</result>
-	<service>LDAP</service>
+	<service>ADSync</service>
 	<version>1.0</version>
 	<status>Ready</status>
 </SMSDirectoryData>
