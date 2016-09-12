@@ -52,6 +52,7 @@ $storage ='../ldapstorage/';
 $syncstaff='yes';
 $syncstudents='yes';
 $createnewstaff='no';
+$updatestaffdetails='no';
 
 // Default Staff Groups
 // Put each group on a new line in quotes, with a comma at the end.

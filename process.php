@@ -8,8 +8,6 @@ what is going on before doing a live sync... as I say...
 I will not be held responsible if you break your AD.
 */
 
-
-echo "<pre>";
 define(LDAP_OPT_DIAGNOSTIC_MESSAGE, 0x0032);
 
 set_time_limit(0);
@@ -19,6 +17,8 @@ ini_set('display_errors',1);
 
 // config
 include ('config.php');
+
+if($live!='yes'){echo "THIS IS A TRIAL SYNC! \r\n";}
 
 // connect
 $ldapconn = ldap_connect($ldapserver) or die("Could not connect to LDAP server.");
@@ -35,8 +35,8 @@ if($ldapconn) {
     // verify binding
     if ($ldapbind) {
       // if successful let tell us.
-        echo "LDAP bind successful...
-Started: ".date('Y-m-d H:i:s')."
+        echo "LDAP bind successful...\r\n
+Started: ".date('Y-m-d H:i:s')." \r\n
 ";
 
     // get list of files from the storage folder
@@ -54,7 +54,7 @@ Started: ".date('Y-m-d H:i:s')."
       //if it isn't an array then skip it.
 	    if(!is_array($data)) {continue;}
       //if live then delete the file
-      //if($live=='yes'){unlink($storage.$file);}
+      if($live=='yes'){unlink($storage.$file);}
       // if we don't have data then skip this file
       if(!array_key_exists('SMSDirectoryData', $data)) {continue;}
 	    if(!array_key_exists('instanceID', $data['SMSDirectoryData'])) {continue;}
@@ -65,11 +65,11 @@ Started: ".date('Y-m-d H:i:s')."
         // for each staff
     		foreach ($data['SMSDirectoryData']['staff']['data'] as $i => $teacher) {
           //get the details needed
-      		$id=htmlspecialchars($teacher['id'],ENT_QUOTES);
-    			$username=htmlspecialchars(strtolower($teacher['username']),ENT_QUOTES);
-    			$firstname=htmlspecialchars($teacher['firstname'],ENT_QUOTES);
-    			$lastname=htmlspecialchars($teacher['lastname'],ENT_QUOTES);
-    			$email=htmlspecialchars($teacher['email'],ENT_QUOTES);
+      		$id=$teacher['id'];
+    			$username=strtolower($teacher['username']);
+    			$firstname=$teacher['firstname'];
+    			$lastname=$teacher['lastname'];
+    			$email=$teacher['email'];
     			$groups=array();
     			foreach($teacher['groups'] as $key => $value){
             // make sure the type is class
@@ -89,9 +89,13 @@ Started: ".date('Y-m-d H:i:s')."
             if($createnewstaff!='yes'){continue;}
             // create them if they don't
             $info=array();
-            $cn = $firstname." ".$lastname;
-          	$cn = str_replace("'", '', $cn);
-          	$cn = str_replace("-", '', $cn);
+            $firstnamecn=str_replace("'", '', $firstname);
+            $firstnamecn=str_replace("-", '', $firstnamecn);
+            $firstnamecn=str_replace(" ", '', $firstnamecn);
+            $lastnamesn=str_replace("'", '', $lastname);
+            $lastnamesn=str_replace("-", '', $lastnamesn);
+            $lastnamesn=str_replace(" ", '', $lastnamesn);
+            $cn = $firstnamecn." ".$lastnamesn;
           	$info["cn"] = $cn;
           	$info["sn"] = $lastname;
           	$info["givenname"] = $firstname;
@@ -110,48 +114,59 @@ Started: ".date('Y-m-d H:i:s')."
 
           	// add data to directory
             $dn = "CN=".$info["cn"].",OU=Staff,".$ldaptree;
-            echo "Adding user ".$info["cn"]." ($dn)
+            echo "Adding user ".$info["cn"]." ($dn) \r\n
 ";          $newuser="yes";
             if($live=='yes') {ldap_add($ldapconn, $dn, $info);}
 
             // add to default staff groups
             foreach ($defaultstaffgroups as $key => $group) {
-              echo "Adding to $group
+              echo "Adding to $group \r\n
 ";            $group_info['member']=$dn;
               if($live=='yes'){ldap_mod_add($ldapconn,$group,$group_info);}
             }
 
           } else {
             $dn = $d[0]['dn'];
-            // corfirm attributes are correct
-            $cn = $firstname." ".$lastname;
-          	$cn = str_replace("'", '', $cn);
-          	$cn = str_replace("-", '', $cn);
-            $info=array();
-          	$info["sn"] = $lastname;
-          	$info["givenname"] = $firstname;
-          	$info["mail"] = $email;
-          	$info["samaccountname"] = $username;
-          	$info["userprincipalname"] = $username.$suffix;
-            if(
-              strtolower($d[0]['sn'][0])!=strtolower($info["sn"]) ||
-              strtolower($d[0]['givenname'][0])!=strtolower($info["givenname"]) ||
-              strtolower($d[0]['mail'][0])!=strtolower($info["mail"]) ||
-              strtolower($d[0]['samaccountname'][0])!=strtolower($info["samaccountname"]) ||
-              strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
-            ) {
-          	   // update user if they aren't
-              echo "Updating user ".$cn." ($dn)
-";            if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
-            }
-            $calcdn = "CN=".$cn.",OU=Staff,".$ldaptree;
-            if($dn!=$calcdn){
-              $oldDn = $dn;
-              $newParent = "OU=Staff,".$ldaptree;
-              $newRdn = "CN=".$cn;
-              echo "Moving user ".$cn." ($dn to $calcdn)
-";            if($live=='yes') {ldap_rename($ldapconn, $oldDn, $newRdn, $newParent, true);}
-              $dn=$calcdn;
+            if($updatestaffdetails=='yes'){
+              // corfirm attributes are correct
+              $firstnamecn=str_replace("'", '', $firstname);
+              $firstnamecn=str_replace("-", '', $firstnamecn);
+              $firstnamecn=str_replace(" ", '', $firstnamecn);
+              $lastnamesn=str_replace("'", '', $lastname);
+              $lastnamesn=str_replace("-", '', $lastnamesn);
+              $lastnamesn=str_replace(" ", '', $lastnamesn);
+              $cn = $firstnamecn." ".$lastnamesn;
+              $info=array();
+            	$info["sn"] = $lastname;
+            	$info["givenname"] = $firstname;
+            	$info["mail"] = $email;
+            	$info["samaccountname"] = $username;
+            	$info["userprincipalname"] = $username.$suffix;
+              if(
+                strtolower($d[0]['sn'][0])!=strtolower($info["sn"]) ||
+                strtolower($d[0]['givenname'][0])!=strtolower($info["givenname"]) ||
+                strtolower($d[0]['mail'][0])!=strtolower($info["mail"]) ||
+                strtolower($d[0]['samaccountname'][0])!=strtolower($info["samaccountname"]) ||
+                strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
+              ) {
+            	   // update user if they aren't
+                echo "Updating user ".$cn." ($dn) \r\n
+                ".strtolower($d[0]['sn'][0])." => ".strtolower($info["sn"])."\r\n
+                ".strtolower($d[0]['givenname'][0])." => ".strtolower($info["givenname"])."\r\n
+                ".strtolower($d[0]['mail'][0])." => ".strtolower($info["mail"])."\r\n
+                ".strtolower($d[0]['samaccountname'][0])." => ".strtolower($info["samaccountname"])."\r\n
+                ".strtolower($d[0]['userprincipalname'][0])." => ".strtolower($info["userprincipalname"])."\r\n
+  ";            if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
+              }
+              $calcdn = "CN=".$cn.",OU=Staff,".$ldaptree;
+              if($dn!=$calcdn){
+                $oldDn = $dn;
+                $newParent = "OU=Staff,".$ldaptree;
+                $newRdn = "CN=".$cn;
+                echo "Moving user ".$cn." ($dn to $calcdn) \r\n
+  ";            if($live=='yes') {ldap_rename($ldapconn, $oldDn, $newRdn, $newParent, true);}
+                $dn=$calcdn;
+              }
             }
           }
           if($newuser=='no'){
@@ -186,18 +201,18 @@ Started: ".date('Y-m-d H:i:s')."
               $info['objectclass'][1] = "group";
               $info["description"] = "Timetable Group, Managed by KAMAR.";
               // add data to directory
-              echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
+              echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree." \r\n
 ";
               if($live=='yes') {ldap_add($ldapconn, 'CN='.$groupcn.",OU=Groups,".$ldaptree, $info);}
             }
-            echo "Adding $dn to $group
+            echo "Adding $dn to $group \r\n
 ";          $group_info['member']=$dn;
             if($live=='yes') {ldap_mod_add($ldapconn,$group,$group_info);}
           }
           //work out which groups to remove person from
           $needtoremove = array_diff($usergroups,$groups);
           foreach ($needtoremove as $key => $group) {
-            echo "Removing $dn from $group
+            echo "Removing $dn from $group \r\n
 ";          $group_info['member']=$dn;
             if($live=='yes') {ldap_mod_del($ldapconn,$group,$group_info);}
           }
@@ -207,12 +222,12 @@ Started: ".date('Y-m-d H:i:s')."
       // for each student
       foreach ($data['SMSDirectoryData']['students']['data'] as $i => $student) {
         //get the details needed
-        $id=htmlspecialchars($student['id'],ENT_QUOTES);
-        $username=htmlspecialchars(strtolower($student['username']),ENT_QUOTES);
-        $firstname=htmlspecialchars($student['firstname'],ENT_QUOTES);
-        $lastname=htmlspecialchars($student['lastname'],ENT_QUOTES);
-        $yearlevel=htmlspecialchars($student['yearlevel'],ENT_QUOTES);
-        $email=htmlspecialchars($student['email'],ENT_QUOTES);
+        $id=$student['id'];
+        $username=strtolower($student['username']);
+        $firstname=$student['firstname'];
+        $lastname=$student['lastname'];
+        $yearlevel=$student['yearlevel'];
+        $email=$student['email'];
         $groups=array();
         foreach($student['groups'] as $key => $value){
           // make sure the type is class
@@ -232,9 +247,13 @@ Started: ".date('Y-m-d H:i:s')."
         if($d['count']<1){
           // create them if they don't
           $info=array();
-          $cn = $firstname." ".$lastname;
-          $cn = str_replace("'", '', $cn);
-          $cn = str_replace("-", '', $cn);
+          $firstnamecn=str_replace("'", '', $firstname);
+          $firstnamecn=str_replace("-", '', $firstnamecn);
+          $firstnamecn=str_replace(" ", '', $firstnamecn);
+          $lastnamesn=str_replace("'", '', $lastname);
+          $lastnamesn=str_replace("-", '', $lastnamesn);
+          $lastnamesn=str_replace(" ", '', $lastnamesn);
+          $cn = $firstnamecn." ".$lastnamesn;
           $info["cn"] = $cn;
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
@@ -253,13 +272,13 @@ Started: ".date('Y-m-d H:i:s')."
 
           // add data to directory
           $dn = "CN=".$info["cn"].",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
-          echo "Adding user ".$info["cn"]." ($dn)
+          echo "Adding user ".$info["cn"]." ($dn) \r\n
 ";          $newuser="yes";
           if($live=='yes') {ldap_add($ldapconn, $dn, $info);}
 
           // add to default student groups
           foreach ($defaultstudentgroups as $key => $group) {
-            echo "Adding to $group
+            echo "Adding to $group \r\n
 ";            $group_info['member']=$dn;
               if($live=='yes'){ldap_mod_add($ldapconn,$group,$group_info);}
           }
@@ -268,9 +287,13 @@ Started: ".date('Y-m-d H:i:s')."
           $dn = $d[0]['dn'];
           // corfirm attributes are correct
           $info=array();
-          $cn = $firstname." ".$lastname;
-          $cn = str_replace("'", '', $cn);
-          $cn = str_replace("-", '', $cn);
+          $firstnamecn=str_replace("'", '', $firstname);
+          $firstnamecn=str_replace("-", '', $firstnamecn);
+          $firstnamecn=str_replace(" ", '', $firstnamecn);
+          $lastnamesn=str_replace("'", '', $lastname);
+          $lastnamesn=str_replace("-", '', $lastnamesn);
+          $lastnamesn=str_replace(" ", '', $lastnamesn);
+          $cn = $firstnamecn." ".$lastnamesn;
           $info["sn"] = $lastname;
           $info["givenname"] = $firstname;
           $info["mail"] = $email;
@@ -284,7 +307,12 @@ Started: ".date('Y-m-d H:i:s')."
             strtolower($d[0]['userprincipalname'][0])!=strtolower($info["userprincipalname"])
           ) {
              // update user if they aren't
-            echo "Updating user ".$cn." ($dn)
+            echo "Updating user ".$cn." ($dn) \r\n
+            ".strtolower($d[0]['sn'][0])." => ".strtolower($info["sn"])."\r\n
+            ".strtolower($d[0]['givenname'][0])." => ".strtolower($info["givenname"])."\r\n
+            ".strtolower($d[0]['mail'][0])." => ".strtolower($info["mail"])."\r\n
+            ".strtolower($d[0]['samaccountname'][0])." => ".strtolower($info["samaccountname"])."\r\n
+            ".strtolower($d[0]['userprincipalname'][0])." => ".strtolower($info["userprincipalname"])."\r\n
 ";            if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
           }
           $calcdn = "CN=".$cn.",OU=Year ".$yearlevel.",OU=Students,".$ldaptree;
@@ -292,7 +320,7 @@ Started: ".date('Y-m-d H:i:s')."
             $oldDn = $dn;
             $newParent = "OU=Year ".$yearlevel.",".$ldaptree;
             $newRdn = "CN=".$cn;
-            echo "Moving user ".$cn." ($dn to $calcdn)
+            echo "Moving user ".$cn." ($dn to $calcdn) \r\n
 ";          if($live=='yes') {ldap_rename($ldapconn, $oldDn, $newRdn, $newParent, true);}
             $dn=$calcdn;
           }
@@ -329,18 +357,18 @@ Started: ".date('Y-m-d H:i:s')."
             $info['objectclass'][1] = "group";
             $info["description"] = "Timetable Group, Managed by KAMAR.";
             // add data to directory
-            echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree."
+            echo "Creating Group CN=".$groupcn.",OU=Groups,".$ldaptree." \r\n
 ";
             if($live=='yes') {ldap_add($ldapconn, 'CN='.$groupcn.",OU=Groups,".$ldaptree, $info);}
           }
-          echo "Adding $dn to $group
+          echo "Adding $dn to $group \r\n
 ";          $group_info['member']=$dn;
           if($live=='yes') {ldap_mod_add($ldapconn,$group,$group_info);}
         }
         //work out which groups to remove person from
         $needtoremove = array_diff($usergroups,$groups);
         foreach ($needtoremove as $key => $group) {
-          echo "Removing $dn from $group
+          echo "Removing $dn from $group \r\n
 ";          $group_info['member']=$dn;
           if($live=='yes') {ldap_mod_del($ldapconn,$group,$group_info);}
         }
@@ -359,15 +387,15 @@ Started: ".date('Y-m-d H:i:s')."
 			if(array_key_exists('member',$thisgroup)){
 				if($thisgroup['member']['count']<2){
 					if($live=='yes') {ldap_delete($ldapconn, $dn);}
-					echo "DELETED
+					echo "DELETED \r\n
 ";
 				} else {
-					echo "FINE
+					echo "FINE \r\n
 ";
 				}
 			} else {
         if($live=='yes') {ldap_delete($ldapconn, $dn);}
-				echo "DELETED
+				echo "DELETED \r\n
 ";
 			}
 		}
@@ -376,7 +404,7 @@ Started: ".date('Y-m-d H:i:s')."
 // all done... clean up
 ldap_close($ldapconn);
 // tell us we are finished.
-echo "All Done...
+echo "All Done... \r\n
 Finished: ".date('Y-m-d H:i:s')."
 ";
 ?>
