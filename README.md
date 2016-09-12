@@ -37,6 +37,11 @@ The fields you need to set are:
 It should then look like this:
 ![Preview](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
 [alt tag](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
+
+If you want to embed images, this is how you do it:
+
+![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+
 Try two:
 <img src="https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png" width="100%"></img>
 
