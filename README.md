@@ -35,7 +35,7 @@ The fields you need to set are:
 - Authentication should be set to whatever you set it to in the config file
 
 It should then look like this:
-[Preview](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
+![Preview](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
 [alt tag](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
 Try two:
 <img src="https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png" width="100%"></img>
