@@ -67,4 +67,4 @@ This is provided as is where is for you to use as you see fit.
 It is not provided with any warranty, explicit or implicit.
 We now have it up and running on our server at KC, but I won't be held responsible if you break your AD... backups are your friend.
 
-Please note: KAMAR cannot provide any support for this as it's not their product :)
+Please note: KAMAR cannot provide any support for this as it's not their product :) 
