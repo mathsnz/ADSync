@@ -35,7 +35,7 @@ The fields you need to set are:
 - Authentication should be set to whatever you set it to in the config file
 
 It should then look like this:
-![alt tag](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png) 
+<img src='img/KAMARSS.png'> 
 
 
 You can then either run using the batch script (you'll need to edit this first) if on windows, or just going to
