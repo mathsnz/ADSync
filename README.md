@@ -36,6 +36,7 @@ The fields you need to set are:
 
 It should then look like this:
 ![Preview](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
+![alt tag](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png "Description goes here")
 Try two:
 <img src="https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png" width="100%"></img>
 
