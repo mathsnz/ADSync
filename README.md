@@ -36,6 +36,8 @@ The fields you need to set are:
 
 It should then look like this:
 ![Preview](https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png)
+Try two:
+<img src="https://raw.githubusercontent.com/mathsnz/ADSync/master/img/KAMARSS.png" width="100%"></img>
 
 
 You can then either run using the batch script (you'll need to edit this first) if on windows, or just going to
