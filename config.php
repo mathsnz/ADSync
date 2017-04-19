@@ -54,6 +54,16 @@ $syncstudents='yes';
 $createnewstaff='no';
 $updatestaffdetails='no';
 
+// Changing student passwords requires this to be run on the same server as the AD.
+// If this is set to 'yes' then passwords will be updated / set when changed on KAMAR.
+// If this is set to 'no' then nothing will be set for the passwords and they must be
+// managed directly from AD (or wherever you manage passwords from elsewhere).
+$changestudentpasswords='no';
+
+// Ignore User Agreement field
+// If set to yes will assume all students have signed the Agreement
+$ignoreuseragreementfield = 'yes';
+
 // Default Staff Groups
 // Put each group on a new line in quotes, with a comma at the end.
 // These groups are added to any new staff that are created.
@@ -75,7 +85,6 @@ $defaultstudentgroups = array(
     'CN=GoogleCloudPrintUsers,OU=Google Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
     'CN=Wireless Enabled Students,OU=Security Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
     'CN=All Students Mail Group,OU=Google Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
-    'CN=Staff,OU=Staff Groups,OU=Security Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
     'CN=CLASS,OU=Student Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
     'CN=Students,OU=Security Groups,OU=Kapiti College,DC=kapiticollege,DC=local',
 );

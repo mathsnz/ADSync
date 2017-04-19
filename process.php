@@ -228,6 +228,18 @@ Started: ".date('Y-m-d H:i:s')." \r\n
         $lastname=$student['lastname'];
         $yearlevel=$student['yearlevel'];
         $email=$student['email'];
+        if($changestudentpasswords=='yes'){
+          $password=$student['password'];
+          $resetpassword=$student['resetpassword'];
+        }
+        $networkaccess=$student['networkaccess'];
+        $accountdisabled=$student['accountdisabled'];
+        if(array_key_exists('leavingdate', $student)){
+          $leavingdate=$student['leavingdate'];
+        } else {
+          $leavingdate="";
+        }
+
         $groups=array();
         foreach($student['groups'] as $key => $value){
           // make sure the type is class
@@ -325,6 +337,61 @@ Started: ".date('Y-m-d H:i:s')." \r\n
             $dn=$calcdn;
           }
         }
+
+        if ($accountdisabled==1) {
+    			//account is disabled - update company field and disable account
+    			echo "Disable user ".$cn." \r\n";
+    			$info=array();
+    			$info["useraccountcontrol"] = 514;
+    			$info["company"] = "Disabled ".date("Y-m-d H:i");
+    			if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
+    		}
+        if($ignoreuseragreementfield=='yes'){
+          //overwrite the networkaccess if you are ignoring this field
+          $networkaccess=1;
+        }
+    		if ($networkaccess==0) {
+    			//contract not signed - update company field and disable account
+    			echo "Disable user ".$cn." \r\n";
+    			$info=array();
+    			$info["useraccountcontrol"] = 514;
+    			$info["company"] = "Agreement ".date("Y-m-d H:i");
+    			if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
+    		}
+
+    		if (($accountdisabled==0) && ($networkaccess==1)) {
+    			//all good, enable account
+    			echo "Ensure user ".$cn." is enabled\r\n";
+    			$info=array();
+    			$info["useraccountcontrol"] = 512;
+    			$info["company"] = "OK ".date("Y-m-d H:i");
+    			if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
+    		}
+
+        if($changestudentpasswords=='yes'){
+          if($resetpassword==1) {
+      			//reset password (as this is using shell the account running process.php will need permissions)
+      			echo 'EXECUTE: dsmod user "'.$dn.'" -pwd '.base64_decode($password).' -mustchpwd no -pwdneverexpires yes';
+      			echo " \r\n";
+      			if($live=='yes') {
+      				$output = shell_exec('dsmod user "'.$dn.'" -pwd '.base64_decode($password).' -mustchpwd no -pwdneverexpires yes');
+      				echo $output."\r\n";
+      			}
+      		}
+        }
+
+    		if (strlen($leavingdate)==8) {
+    			//kamar only sends this info out once when a student is first changed to a leaver so need to act on it (i.e not in the over night file)
+    			echo "Has left ".$cn." \r\n";
+    			$info=array();
+    			$info["company"] = "Leaver ".date("Y-m-d H:i");
+    			$info["useraccountcontrol"] = 514;
+    			//alternative to disabling account is to set the expiration date to expire in X days (not tested)
+    			// $disableddate = date('Ymd', strtotime($leavingdate. ' + 5 days'));
+    			// $info["accountexpirationdate"] = $disableddate;
+    			if($live=='yes') {ldap_mod_replace($ldapconn, $dn, $info);}
+    		}
+
         if($newuser=='no'){
           //get that user's groups from ldaptree
           $usergroups=array();
