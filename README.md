@@ -13,9 +13,10 @@ It Does:
 - Update Staff Groups based on Timetabled Classes
 - Update Student Details
 - Update Staff Details (optional)
+- Update Student Passwords (optional)
 
 It Doesn't:
-- Do anything with passwords
+- Do anything with staff passwords
 
 # Installation
 
