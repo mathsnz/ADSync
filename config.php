@@ -94,4 +94,8 @@ $defaultstudentgroups = array(
 // eg: '\\\\kapiticollege.local\\users\\staff\\'
 $staffhomes = '\\\\kapiticollege.local\\users\\staff\\';
 $studenthomes = '\\\\kc-student01\\Student_Home\\';
+
+// Timezone
+// Can probably be left as is
+date_default_timezone_set("Pacific/Auckland");
 ?>
