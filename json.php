@@ -5,8 +5,11 @@ header("Content-type: application/json");
 //Get Data
 $data = file_get_contents('php://input');
 
-if (!file_exists($storage.'dsdata/')) {
+if (!file_exists($storage)) {
     mkdir($storage, 0777, true);
+}
+if (!file_exists($storage.'dsdata/')) {
+    mkdir($storage.'dsdata/', 0777, true);
 }
 
 //Check for data
