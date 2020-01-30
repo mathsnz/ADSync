@@ -18,6 +18,11 @@ It Does:
 It Doesn't:
 - Do anything with staff passwords
 
+Important Note:
+Microsoft is disabling unsigned LDAP from March 2020... to use LDAPS you just need to follow these instructions:
+http://greg.cathell.net/php_ldap_ssl.html
+I didn't seem to need to so step 2.
+
 # Installation
 
 To install extract the files onto a server running PHP and some web publishing thing (eg: Apache, IIS etc.) and note down where this is going to be running.
