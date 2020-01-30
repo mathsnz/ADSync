@@ -14,8 +14,9 @@ I will not be held responsible if you break your AD.
 $authentication = 'dlfkgo78sfdg';
 
 // The IP or Name of the DC
-// eg: '172.30.0.104'
-$ldapserver = 'localhost';
+// eg: 'ldaps://172.30.0.104'
+// make sure you've enabled LDAPS
+$ldapserver = 'ldaps://localhost';
 
 // The full DN of the LDAP Admin you want to authenticate with
 // eg: 'CN=Jake Wills,OU=Teacher,OU=Staff,OU=KAMAR,DC=kapiticollege,DC=local'
