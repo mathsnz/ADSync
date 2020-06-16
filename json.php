@@ -22,7 +22,6 @@ if(isset($data)) {
 	fclose($file);
 
 	//Generate Response
-	//Generate Response
 	$string = <<<JSON
   {"SMSDirectoryData": {
       "error": 0,
@@ -42,7 +41,6 @@ if(isset($data)) {
               "assessments": false,
               "awards": false,
               "pastoral": false,
-              "awards": false,
               "learningsupport": false,
               "fields": {
                 "required": "uniqueid;firstname;lastname;email;username;password;yearlevel;startingdate;leavingdate;networkaccess"
