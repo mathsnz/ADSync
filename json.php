@@ -1,15 +1,15 @@
 <?php
 include 'config.php';
 header("Content-type: application/json");
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors',1);
 
 //Get Data
 $data = file_get_contents('php://input');
 
 if (!file_exists($storage)) {
     mkdir($storage, 0777, true);
-}
-if (!file_exists($storage.'dsdata/')) {
-    mkdir($storage.'dsdata/', 0777, true);
 }
 
 //Check for data
@@ -22,20 +22,55 @@ if(isset($data)) {
 	fclose($file);
 
 	//Generate Response
+	//Generate Response
 	$string = <<<JSON
-{"SMSDirectoryData": {
-	"error": 0,
-	"result": "OK",
-	"service": "ADSync",
-	"version": 1.0,
-	"status": "Ready"
-}}
+  {"SMSDirectoryData": {
+      "error": 0,
+      "result": "OK",
+      "service": "ADSync",
+      "version": 1.1,
+      "status": "Ready",
+      "options": {
+          "ics": false,
+          "students": {
+              "details": true,
+              "passwords": true,
+              "photos": false,
+              "groups": false,
+              "timetables": false,
+              "attendance": false,
+              "assessments": false,
+              "awards": false,
+              "pastoral": false,
+              "awards": false,
+              "learningsupport": false,
+              "fields": {
+                "required": "uniqueid;firstname;lastname;email;username;password;yearlevel;startingdate;leavingdate;networkaccess"
+                }
+              },
+          "staff": {
+              "details": true,
+              "passwords": true,
+              "photos": false,
+              "timetables": false,
+              "fields": {
+                "required": "uniqueid;firstname;lastname;email;username;password"
+                }
+              },
+          "common": {
+              "subjects": false,
+              "notices": false,
+              "calendar": false,
+              "bookings": false
+              }
+          }
+      }
+  }
 JSON;
 
 	//Display Response
 	echo $string;
-}
-else {
+} else {
 
 	//Generate Response
 	$string = <<<XML
@@ -44,7 +79,7 @@ else {
 	<error>401</error>
 	<result>No Data</result>
 	<service>ADSync</service>
-	<version>1.0</version>
+	<version>1.1</version>
 	<status>Ready</status>
 </SMSDirectoryData>
 XML;
