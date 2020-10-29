@@ -14,6 +14,13 @@ if (!file_exists($storage)) {
 
 //Check for data
 if(isset($data)) {
+	
+  $contents = json_decode(str_replace(",,",",",$data),true);
+  if(!is_array($contents)) {error();die();}
+  if(!array_key_exists('SMSDirectoryData', $contents)) {error();die();}
+  if(!array_key_exists('instanceID', $contents['SMSDirectoryData'])) {error();die();}
+  if($contents['SMSDirectoryData']['instanceID']!=$authentication){error();die();}	
+	  
   //create a random string to avoid duplicate files being created.
   $randomString = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
   //Write xml file
@@ -69,21 +76,20 @@ JSON;
 	//Display Response
 	echo $string;
 } else {
-
+	error();
+}
+function error() {
 	//Generate Response
-	$string = <<<XML
-<?xml version="1.0" encoding="UTF-8"?>
-<SMSDirectoryData>
-	<error>401</error>
-	<result>No Data</result>
-	<service>ADSync</service>
-	<version>1.1</version>
-	<status>Ready</status>
-</SMSDirectoryData>
-XML;
-
-	//Display Response
-	$xml = new SimpleXMLElement($string);
-	echo $xml->asXML();
+	$string = <<<JSON
+  {"SMSDirectoryData": {
+    "error": 401,
+    "result": "Unauthorised",
+    "service": "ADSync",
+    "version": 1.0,
+    "status": "Ready"
+    }
+  }
+JSON;
+ echo $string;
 }
 ?>
