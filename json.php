@@ -42,7 +42,7 @@ if(isset($data)) {
               "details": true,
               "passwords": true,
               "photos": false,
-              "groups": false,
+              "groups": true,
               "timetables": false,
               "attendance": false,
               "assessments": false,
