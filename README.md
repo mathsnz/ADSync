@@ -1,6 +1,12 @@
 # ADSync
 Sync to AD from KAMAR using a PHP listening / LDAP service.
 
+# Important Note
+Please note, this is no longer being developed. KAMAR has recently made changes (start of 2021) to directory services which means this will stop working shortly without changes to the code... these can be seen here: https://directoryservices.kamar.nz/
+I'm now switching over to uSync[https://www.usync.nz/]
+
+# Old Info
+
 This incorporates a listening service for KAMAR and then a file that processes that Data and updates AD using LDAP
 
 We now have this up and running on our servers and it's working great.
